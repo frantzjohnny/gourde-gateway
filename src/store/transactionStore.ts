@@ -1,5 +1,6 @@
 interface Transaction {
   id: string;
+  userId: string;
   type: 'income' | 'expense';
   amount: number;
   category: string;
@@ -35,8 +36,18 @@ class TransactionStore {
     return newTransaction;
   }
 
-  getTransactions(): Transaction[] {
-    return this.transactions;
+  getTransactionsByUserId(userId: string): Transaction[] {
+    return this.transactions.filter(t => t.userId === userId);
+  }
+
+  getBalanceByUserId(userId: string): number {
+    return this.getTransactionsByUserId(userId).reduce((acc, transaction) => {
+      if (transaction.type === 'income') {
+        return acc + transaction.amount;
+      } else {
+        return acc - transaction.amount;
+      }
+    }, 0);
   }
 
   private saveToLocalStorage() {

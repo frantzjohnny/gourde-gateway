@@ -2,18 +2,24 @@ import { useEffect, useState } from "react";
 import { transactionStore } from "@/store/transactionStore";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
+import { getCurrentUser } from "@/lib/storage";
 
 const Transactions = () => {
-  const [transactions, setTransactions] = useState(transactionStore.getTransactions());
+  const currentUser = getCurrentUser();
+  const [transactions, setTransactions] = useState(
+    currentUser ? transactionStore.getTransactionsByUserId(currentUser.id) : []
+  );
 
   useEffect(() => {
     const updateTransactions = () => {
-      setTransactions(transactionStore.getTransactions());
+      if (currentUser) {
+        setTransactions(transactionStore.getTransactionsByUserId(currentUser.id));
+      }
     };
 
     window.addEventListener("storage", updateTransactions);
     return () => window.removeEventListener("storage", updateTransactions);
-  }, []);
+  }, [currentUser]);
 
   return (
     <div className="min-h-screen">

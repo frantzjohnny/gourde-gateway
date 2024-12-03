@@ -1,9 +1,13 @@
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { getCurrentUser } from "@/lib/storage";
+import { transactionStore } from "@/store/transactionStore";
 
 export const Balance = () => {
   const [showBalance, setShowBalance] = useState(true);
+  const currentUser = getCurrentUser();
+  const balance = currentUser ? transactionStore.getBalanceByUserId(currentUser.id) : 0;
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg">
@@ -22,7 +26,7 @@ export const Balance = () => {
           "text-4xl font-bold transition-opacity duration-200",
           !showBalance && "opacity-0"
         )}>
-          68,000.50
+          {balance.toLocaleString()}
         </span>
       </div>
     </div>
