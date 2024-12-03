@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { categories, transactionStore } from "@/store/transactionStore";
 import { toast } from "sonner";
+import { getCurrentUser } from "@/lib/storage";
 
 const formSchema = z.object({
   type: z.enum(["income", "expense"]),
@@ -27,12 +28,20 @@ export const AddTransactionForm = ({ onSuccess }: { onSuccess: () => void }) => 
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    const currentUser = getCurrentUser();
+    
+    if (!currentUser) {
+      toast.error("Vous devez être connecté pour ajouter une transaction");
+      return;
+    }
+
     transactionStore.addTransaction({
       type: values.type,
       amount: parseFloat(values.amount),
       category: values.category,
       description: values.description,
       date: new Date(),
+      userId: currentUser.id
     });
     
     toast.success("Transaction ajoutée avec succès");
