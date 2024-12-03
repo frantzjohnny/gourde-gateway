@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface CreditCard {
   bank: string;
   amount: number;
