@@ -1,31 +1,55 @@
-import { Home, List, PlusCircle, BarChart3, MoreHorizontal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Home, List, Plus, PiggyBank, MoreHorizontal } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AddTransactionForm } from "./AddTransactionForm";
 
 export const BottomNav = () => {
+  const location = useLocation();
+  
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
-      <div className="flex justify-around items-center p-3">
-        <Link to="/" className="flex flex-col items-center gap-1">
-          <Home className="h-6 w-6 text-primary" />
-          <span className="text-xs">Accueil</span>
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3 px-6">
+      <div className="max-w-md mx-auto flex justify-between items-center">
+        <Link to="/" className={`flex flex-col items-center ${location.pathname === "/" ? "text-primary" : "text-gray-500"}`}>
+          <Home size={24} />
+          <span className="text-xs mt-1">Accueil</span>
         </Link>
-        <Link to="/transactions" className="flex flex-col items-center gap-1">
-          <List className="h-6 w-6 text-gray-500" />
-          <span className="text-xs">Liste</span>
+        
+        <Link to="/transactions" className={`flex flex-col items-center ${location.pathname === "/transactions" ? "text-primary" : "text-gray-500"}`}>
+          <List size={24} />
+          <span className="text-xs mt-1">Transactions</span>
         </Link>
-        <button className="flex flex-col items-center gap-1 -mt-8">
-          <div className="bg-primary rounded-full p-4 shadow-lg">
-            <PlusCircle className="h-6 w-6 text-white" />
-          </div>
-        </button>
-        <Link to="/planning" className="flex flex-col items-center gap-1">
-          <BarChart3 className="h-6 w-6 text-gray-500" />
-          <span className="text-xs">Planning</span>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="flex flex-col items-center -mt-8">
+              <div className="bg-primary rounded-full p-4">
+                <Plus size={24} className="text-white" />
+              </div>
+              <span className="text-xs mt-1 text-primary">Ajouter</span>
+            </button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Ajouter une transaction</DialogTitle>
+            </DialogHeader>
+            <AddTransactionForm onSuccess={() => {
+              const closeButton = document.querySelector('[aria-label="Close"]');
+              if (closeButton instanceof HTMLElement) {
+                closeButton.click();
+              }
+            }} />
+          </DialogContent>
+        </Dialog>
+        
+        <Link to="/planning" className={`flex flex-col items-center ${location.pathname === "/planning" ? "text-primary" : "text-gray-500"}`}>
+          <PiggyBank size={24} />
+          <span className="text-xs mt-1">Planning</span>
         </Link>
-        <button className="flex flex-col items-center gap-1">
-          <MoreHorizontal className="h-6 w-6 text-gray-500" />
-          <span className="text-xs">Plus</span>
-        </button>
+        
+        <Link to="/more" className={`flex flex-col items-center ${location.pathname === "/more" ? "text-primary" : "text-gray-500"}`}>
+          <MoreHorizontal size={24} />
+          <span className="text-xs mt-1">Plus</span>
+        </Link>
       </div>
     </nav>
   );
