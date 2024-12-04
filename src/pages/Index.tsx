@@ -1,6 +1,6 @@
 import { Balance } from "@/components/Balance";
 import { TransactionSummary } from "@/components/TransactionSummary";
-import { CreditCards } from "@/components/CreditCards";
+import { RecentTransactions } from "@/components/RecentTransactions";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
@@ -12,7 +12,7 @@ const Index = () => {
       <div className="p-6 pb-24 max-w-md mx-auto">
         <Balance />
         <TransactionSummary />
-        <CreditCards />
+        <RecentTransactions />
         <ProgressBar 
           current={510.87}
           total={8500}
