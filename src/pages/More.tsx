@@ -47,6 +47,9 @@ const More = () => {
           </div>
         </div>
       </div>
+      <footer className="text-center p-4 text-sm text-gray-500 border-t">
+        Application créée par Johnny F Toussaint
+      </footer>
       <BottomNav />
     </div>
   );

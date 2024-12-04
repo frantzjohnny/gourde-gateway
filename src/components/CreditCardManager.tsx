@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { getCurrentUser } from "@/lib/storage";
 import { PlusCircle, Trash2 } from "lucide-react";
@@ -11,6 +12,8 @@ interface CreditCard {
   userId: string;
   number: string;
   name: string;
+  bank: string;
+  type: "credit" | "debit";
 }
 
 const CreditCardManager = () => {
@@ -20,6 +23,8 @@ const CreditCardManager = () => {
   });
   const [newCardNumber, setNewCardNumber] = useState("");
   const [newCardName, setNewCardName] = useState("");
+  const [newCardBank, setNewCardBank] = useState("");
+  const [newCardType, setNewCardType] = useState<"credit" | "debit">("credit");
 
   const user = getCurrentUser();
 
@@ -30,7 +35,7 @@ const CreditCardManager = () => {
 
   const addCard = () => {
     if (!user) return;
-    if (!newCardNumber || !newCardName) {
+    if (!newCardNumber || !newCardName || !newCardBank) {
       toast.error("Veuillez remplir tous les champs");
       return;
     }
@@ -40,12 +45,16 @@ const CreditCardManager = () => {
       userId: user.id,
       number: newCardNumber.replace(/\s/g, "").slice(-4),
       name: newCardName,
+      bank: newCardBank,
+      type: newCardType
     };
 
     const updatedCards = [...cards, newCard];
     saveCards(updatedCards);
     setNewCardNumber("");
     setNewCardName("");
+    setNewCardBank("");
+    setNewCardType("credit");
     toast.success("Carte ajoutée avec succès");
   };
 
@@ -68,12 +77,26 @@ const CreditCardManager = () => {
             onChange={(e) => setNewCardName(e.target.value)}
           />
           <Input
+            placeholder="Nom de la banque"
+            value={newCardBank}
+            onChange={(e) => setNewCardBank(e.target.value)}
+          />
+          <Input
             placeholder="Numéro de carte"
             value={newCardNumber}
             onChange={(e) => setNewCardNumber(e.target.value)}
             type="number"
             maxLength={16}
           />
+          <Select value={newCardType} onValueChange={(value: "credit" | "debit") => setNewCardType(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Type de carte" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="credit">Carte de crédit</SelectItem>
+              <SelectItem value="debit">Carte de débit</SelectItem>
+            </SelectContent>
+          </Select>
           <Button onClick={addCard} className="w-full">
             <PlusCircle className="mr-2 h-4 w-4" />
             Ajouter la carte
@@ -92,6 +115,9 @@ const CreditCardManager = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">{card.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {card.bank} - {card.type === "credit" ? "Crédit" : "Débit"}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       **** **** **** {card.number}
                     </p>
