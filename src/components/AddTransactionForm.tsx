@@ -9,6 +9,7 @@ import { categories, transactionStore } from "@/store/transactionStore";
 import { toast } from "sonner";
 import { getCurrentUser } from "@/lib/storage";
 import { useEffect } from "react";
+import { DialogClose } from "@/components/ui/dialog";
 
 const formSchema = z.object({
   type: z.enum(["income", "expense"]),
@@ -21,9 +22,10 @@ interface AddTransactionFormProps {
   onSuccess: () => void;
   initialData?: any;
   isEditing?: boolean;
+  onClose?: () => void;
 }
 
-export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false }: AddTransactionFormProps) => {
+export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, onClose }: AddTransactionFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,7 +47,7 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false }
     }
   }, [initialData, isEditing, form]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const currentUser = getCurrentUser();
     
     if (!currentUser) {
@@ -64,6 +66,7 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false }
       if (success) {
         toast.success("Transaction modifiée avec succès");
         onSuccess();
+        onClose?.();
       } else {
         toast.error("Erreur lors de la modification de la transaction");
       }
@@ -79,6 +82,7 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false }
       
       toast.success("Transaction ajoutée avec succès");
       onSuccess();
+      onClose?.();
     }
     
     if (!isEditing) {
