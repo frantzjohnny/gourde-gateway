@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { transactionStore } from "@/store/transactionStore";
 import { getCurrentUser } from "@/lib/storage";
+import { motion } from "framer-motion";
 
 export const TransactionSummary = () => {
   const currentUser = getCurrentUser();
@@ -25,30 +26,38 @@ export const TransactionSummary = () => {
   const totals = calculateTotals();
 
   return (
-    <div className="grid grid-cols-2 gap-4 mt-6">
-      <div className="bg-white rounded-2xl p-4 shadow-lg">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="bg-green-100 p-2 rounded-full">
+    <div className="grid grid-cols-2 gap-4">
+      <motion.div 
+        className="bg-white rounded-2xl p-6 shadow-lg"
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="bg-green-100 p-2.5 rounded-full">
             <ArrowUp className="text-green-600" size={20} />
           </div>
-          <span className="text-gray-500">Recettes</span>
+          <span className="text-gray-500 font-medium">Recettes</span>
         </div>
-        <div className="text-xl font-semibold">
+        <div className="text-2xl font-bold text-gray-900">
           HTG {totals.income.toLocaleString()}
         </div>
-      </div>
+      </motion.div>
       
-      <div className="bg-white rounded-2xl p-4 shadow-lg">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="bg-red-100 p-2 rounded-full">
+      <motion.div 
+        className="bg-white rounded-2xl p-6 shadow-lg"
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="bg-red-100 p-2.5 rounded-full">
             <ArrowDown className="text-red-600" size={20} />
           </div>
-          <span className="text-gray-500">Dépenses</span>
+          <span className="text-gray-500 font-medium">Dépenses</span>
         </div>
-        <div className="text-xl font-semibold">
+        <div className="text-2xl font-bold text-gray-900">
           HTG {totals.expense.toLocaleString()}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
