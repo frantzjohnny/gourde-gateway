@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { categories, transactionStore } from "@/store/transactionStore";
 import { toast } from "sonner";
 import { getCurrentUser } from "@/lib/storage";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   type: z.enum(["income", "expense"]),
@@ -16,7 +17,13 @@ const formSchema = z.object({
   description: z.string().min(1, "La description est requise"),
 });
 
-export const AddTransactionForm = ({ onSuccess }: { onSuccess: () => void }) => {
+interface AddTransactionFormProps {
+  onSuccess: () => void;
+  initialData?: any;
+  isEditing?: boolean;
+}
+
+export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false }: AddTransactionFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -27,6 +34,17 @@ export const AddTransactionForm = ({ onSuccess }: { onSuccess: () => void }) => 
     },
   });
 
+  useEffect(() => {
+    if (initialData && isEditing) {
+      form.reset({
+        type: initialData.type,
+        amount: initialData.amount.toString(),
+        category: initialData.category,
+        description: initialData.description,
+      });
+    }
+  }, [initialData, isEditing, form]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const currentUser = getCurrentUser();
     
@@ -35,18 +53,37 @@ export const AddTransactionForm = ({ onSuccess }: { onSuccess: () => void }) => 
       return;
     }
 
-    transactionStore.addTransaction({
-      type: values.type,
-      amount: parseFloat(values.amount),
-      category: values.category,
-      description: values.description,
-      date: new Date(),
-      userId: currentUser.id
-    });
+    if (isEditing && initialData) {
+      const success = transactionStore.updateTransaction(initialData.id, {
+        type: values.type,
+        amount: parseFloat(values.amount),
+        category: values.category,
+        description: values.description,
+      });
+
+      if (success) {
+        toast.success("Transaction modifiée avec succès");
+        onSuccess();
+      } else {
+        toast.error("Erreur lors de la modification de la transaction");
+      }
+    } else {
+      transactionStore.addTransaction({
+        type: values.type,
+        amount: parseFloat(values.amount),
+        category: values.category,
+        description: values.description,
+        date: new Date(),
+        userId: currentUser.id
+      });
+      
+      toast.success("Transaction ajoutée avec succès");
+      onSuccess();
+    }
     
-    toast.success("Transaction ajoutée avec succès");
-    onSuccess();
-    form.reset();
+    if (!isEditing) {
+      form.reset();
+    }
   };
 
   return (
@@ -130,7 +167,9 @@ export const AddTransactionForm = ({ onSuccess }: { onSuccess: () => void }) => 
           )}
         />
 
-        <Button type="submit" className="w-full">Ajouter la transaction</Button>
+        <Button type="submit" className="w-full">
+          {isEditing ? "Modifier la transaction" : "Ajouter la transaction"}
+        </Button>
       </form>
     </Form>
   );

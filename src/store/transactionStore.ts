@@ -36,6 +36,19 @@ class TransactionStore {
     return newTransaction;
   }
 
+  updateTransaction(id: string, updates: Partial<Omit<Transaction, 'id' | 'userId'>>) {
+    const index = this.transactions.findIndex(t => t.id === id);
+    if (index !== -1) {
+      this.transactions[index] = {
+        ...this.transactions[index],
+        ...updates
+      };
+      this.saveToLocalStorage();
+      return true;
+    }
+    return false;
+  }
+
   getTransactionsByUserId(userId: string): Transaction[] {
     return this.transactions.filter(t => t.userId === userId);
   }
