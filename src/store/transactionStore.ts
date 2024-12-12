@@ -6,6 +6,7 @@ interface Transaction {
   category: string;
   description: string;
   date: Date;
+  currency: 'HTG' | 'USD';
 }
 
 class TransactionStore {
