@@ -1,14 +1,24 @@
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/storage";
 import { transactionStore } from "@/store/transactionStore";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export const Balance = () => {
   const [showBalance, setShowBalance] = useState(true);
   const currentUser = getCurrentUser();
   const balance = currentUser ? transactionStore.getBalanceByUserId(currentUser.id) : 0;
+
+  useEffect(() => {
+    if (balance < 0) {
+      toast.error("Attention: Votre solde est négatif!", {
+        description: `Votre solde actuel est de HTG ${balance.toLocaleString()}`,
+        duration: 5000,
+      });
+    }
+  }, [balance]);
 
   return (
     <motion.div 
@@ -30,7 +40,8 @@ export const Balance = () => {
         <motion.span 
           className={cn(
             "text-4xl font-bold transition-opacity duration-200",
-            !showBalance && "opacity-0"
+            !showBalance && "opacity-0",
+            balance < 0 ? "text-red-300" : "text-white"
           )}
           initial={{ opacity: 0 }}
           animate={{ opacity: showBalance ? 1 : 0 }}
