@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { getCurrentUser } from "@/lib/storage";
 import { useEffect } from "react";
 import { DialogClose } from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   type: z.enum(["income", "expense"]),
@@ -27,6 +28,16 @@ interface AddTransactionFormProps {
 }
 
 export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, onClose }: AddTransactionFormProps) => {
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+
+  useEffect(() => {
+    if (!currentUser) {
+      toast.error("Vous devez être connecté pour effectuer une transaction");
+      navigate("/login");
+    }
+  }, [currentUser, navigate]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,10 +62,9 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
   }, [initialData, isEditing, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const currentUser = getCurrentUser();
-    
     if (!currentUser) {
       toast.error("Vous devez être connecté pour ajouter une transaction");
+      navigate("/login");
       return;
     }
 
@@ -107,6 +117,10 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
       form.reset();
     }
   };
+
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <Form {...form}>
