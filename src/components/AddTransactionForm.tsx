@@ -16,6 +16,7 @@ const formSchema = z.object({
   amount: z.string().min(1, "Le montant est requis"),
   category: z.string().min(1, "La catégorie est requise"),
   description: z.string().min(1, "La description est requise"),
+  currency: z.enum(["HTG", "USD"]),
 });
 
 interface AddTransactionFormProps {
@@ -33,6 +34,7 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
       amount: "",
       category: "",
       description: "",
+      currency: "HTG",
     },
   });
 
@@ -43,6 +45,7 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
         amount: initialData.amount.toString(),
         category: initialData.category,
         description: initialData.description,
+        currency: initialData.currency || "HTG",
       });
     }
   }, [initialData, isEditing, form]);
@@ -55,12 +58,26 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
       return;
     }
 
+    // Convertir le montant en HTG si nécessaire
+    let finalAmount = parseFloat(values.amount);
+    if (values.currency === "USD") {
+      try {
+        const response = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
+        const data = await response.json();
+        finalAmount = finalAmount * data.rates.HTG;
+      } catch (error) {
+        toast.error("Erreur lors de la conversion de la devise");
+        return;
+      }
+    }
+
     if (isEditing && initialData) {
       const success = transactionStore.updateTransaction(initialData.id, {
         type: values.type,
-        amount: parseFloat(values.amount),
+        amount: finalAmount,
         category: values.category,
         description: values.description,
+        currency: values.currency,
       });
 
       if (success) {
@@ -73,9 +90,10 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
     } else {
       transactionStore.addTransaction({
         type: values.type,
-        amount: parseFloat(values.amount),
+        amount: finalAmount,
         category: values.category,
         description: values.description,
+        currency: values.currency,
         date: new Date(),
         userId: currentUser.id
       });
@@ -115,19 +133,43 @@ export const AddTransactionForm = ({ onSuccess, initialData, isEditing = false, 
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Montant (HTG)</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="0.00" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Montant</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="0.00" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="currency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Devise</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez la devise" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="HTG">HTG</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
