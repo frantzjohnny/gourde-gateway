@@ -1,15 +1,13 @@
 import { Balance } from "@/components/Balance";
 import { TransactionSummary } from "@/components/TransactionSummary";
 import { RecentTransactions } from "@/components/RecentTransactions";
-import { ProgressBar } from "@/components/ProgressBar";
-import { ExchangeRate } from "@/components/ExchangeRate";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { motion } from "framer-motion";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-accent/20">
+    <div className="min-h-screen bg-gradient-to-b from-primary/90 to-primary/70">
       <Header />
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -35,37 +33,14 @@ const Index = () => {
           <TransactionSummary />
         </motion.div>
 
-        {/* Exchange Rate */}
+        {/* Recent Transactions */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
           className="bg-white rounded-2xl shadow-lg overflow-hidden"
         >
-          <ExchangeRate />
-        </motion.div>
-
-        {/* Recent Transactions */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden"
-        >
           <RecentTransactions />
-        </motion.div>
-
-        {/* Progress Bar */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <ProgressBar 
-            current={510.87}
-            total={8500}
-            label="Planification Total"
-          />
         </motion.div>
       </motion.div>
       <BottomNav />
