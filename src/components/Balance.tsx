@@ -22,26 +22,26 @@ export const Balance = () => {
 
   return (
     <motion.div 
-      className="bg-white/90 rounded-2xl p-8 shadow-lg"
+      className="bg-gradient-to-br from-primary/90 to-secondary/90 rounded-2xl p-8 shadow-lg text-white"
       whileHover={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-gray-600 font-medium">Solde disponible</h2>
+        <h2 className="text-white/90 font-medium">Solde en compte</h2>
         <button
           onClick={() => setShowBalance(!showBalance)}
-          className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-full hover:bg-gray-100"
+          className="text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
         >
           {showBalance ? <EyeOff size={20} /> : <Eye size={20} />}
         </button>
       </div>
       <div className="flex items-baseline">
-        <span className="text-2xl font-medium text-gray-600 mr-2">HTG</span>
+        <span className="text-2xl font-medium text-white/90 mr-2">HTG</span>
         <motion.span 
           className={cn(
             "text-4xl font-bold transition-opacity duration-200",
             !showBalance && "opacity-0",
-            balance < 0 ? "text-red-600" : "text-gray-800"
+            balance < 0 ? "text-red-300" : "text-white"
           )}
           initial={{ opacity: 0 }}
           animate={{ opacity: showBalance ? 1 : 0 }}
